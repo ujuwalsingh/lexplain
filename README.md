@@ -52,7 +52,7 @@ cd lexplain
 See backend/README.md for setup instructions.
 
 3. Setup Frontend
-See frontend/README.md.
+See frontend/README.md.```
 
 👥 Team & Work Distribution
 Backend (Flask APIs, Google Cloud integration) → Lead by You
@@ -90,4 +90,4 @@ To make legal knowledge accessible to everyone, by bridging the gap between law 
 pgsql
 Copy code
 
-👉 This README introduces the **project purpose, structure, features, setup, team distribution, and hackathon roadmap** all in one.  
+👉 This README introduces the **project purpose, structure, features, setup, team distribution, and hackathon roadmap** all in one.
