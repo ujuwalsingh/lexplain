@@ -1,99 +1,93 @@
-# Lexplain 📝⚖️
-**Demystifying Legal Documents with AI**  
+# ⚖️ Lexplain
 
-Lexplain is an AI-powered tool that simplifies complex legal documents into clear, plain language.  
-It highlights obligations, deadlines, penalties, and risks — helping users understand their contracts without needing a law degree.  
-⚠️ **Disclaimer:** Lexplain does *not* provide legal advice. Always consult a qualified lawyer for official guidance.  
+**Lexplain** is an AI-powered platform that **demystifies legal documents** by converting complex legal jargon into clear, plain language.  
+It helps **businesses, researchers, and individuals** understand contracts, policies, and other legal texts quickly and confidently.
 
 ---
 
-## 🚀 Features
-- 📄 **Upload & Parse**: Upload legal PDFs/Word docs for AI-powered analysis.  
-- 🔎 **Simplification**: Clause-by-clause plain language summaries.  
-- 📝 **Highlights**: Extract obligations, deadlines, penalties, parties.  
-- 💬 **Interactive Q&A**: Ask questions, get answers with citations.  
-- 📊 **Checklist Export**: Generate task lists from contract obligations.  
-- 🌐 **Google Cloud AI**: Built with Document AI, Vertex AI (Gemini), Vector Search.  
+## ✨ Features (Planned)
+
+- 📄 **Document Upload** (PDF/Word)
+- 📝 **Plain-Language Summaries**
+- 📌 **Clause-Level Explanations**
+- ❓ **Interactive Q&A** (ask questions about the document)
+- 📊 **Highlights** (deadlines, obligations, penalties)
+- 🌍 **Multi-language Support**
+- ⚡ **Real-time Verification** (cross-referencing reliable sources)
 
 ---
 
-## 🏗️ Tech Stack
-**Frontend**  
-- React + Tailwind (UI)  
-- Firebase Hosting (optional for deployment)  
+## 🏗️ Project Structure
 
-**Backend**  
-- Node.js (Express)  
-- Google Cloud Document AI (OCR, parsing)  
-- Google Vertex AI (Gemini, embeddings, vector search)  
-- Firestore / Cloud Storage  
-
-**ML / AI Layer**  
-- Document chunking + embeddings  
-- RAG (Retrieval-Augmented Generation) with Gemini  
-- Hallucination control via source citations  
-
-**DevOps**  
-- GitHub (repo & version control)  
-- Cloud Run (serverless backend)  
-- IAM & Cloud Security (compliance)  
-
----
-
-## 📂 Repo Structure
 lexplain/
-│── backend/ # Node.js backend
-│ ├── server.js
-│ ├── routes/
-│ ├── services/
-│ └── package.json
 │
-│── frontend/ # React frontend
-│ ├── src/
-│ ├── public/
-│ └── package.json
+├── backend/ # Flask backend (APIs, integration with AI/ML)
+│ ├── app.py
+│ ├── requirements.txt
+│ └── README.md
 │
-│── ml/ # AI/ML logic
-│ ├── chunker.js
-│ └── experiments/
+├── frontend/ # React frontend (UI/UX)
+│ └── README.md
 │
-│── docs/ # Diagrams, notes
-│ ├── wireframes/
-│ └── architecture.md
+├── ml/ # Machine Learning models / experiments
+│ └── README.md
 │
-│── .gitignore
-│── README.md
+├── docs/ # Documentation (designs, API specs, planning)
+│ └── README.md
+│
+└── README.md # <--- You are here (project overview)
 
 yaml
 Copy code
 
 ---
 
-## ⚡ Getting Started
+## 🚀 Getting Started
 
-### 1. Clone the repo
+### 1. Clone the Repository
 ```bash
 git clone https://github.com/<your-username>/lexplain.git
 cd lexplain
-2. Backend Setup
-bash
+2. Setup Backend
+See backend/README.md for setup instructions.
+
+3. Setup Frontend
+See frontend/README.md.
+
+👥 Team & Work Distribution
+Backend (Flask APIs, Google Cloud integration) → Lead by You
+
+Frontend (React UI/UX) → Teammate 1
+
+ML/AI (Summarization, Q&A, NLP models) → Teammate 2
+
+Docs (Wireframes, API contracts, research) → Teammate 3
+
+All members will collaborate across areas, but this helps maintain focus.
+
+📌 Roadmap (Hackathon Plan)
+ Setup backend boilerplate (Flask + routes)
+
+ Setup frontend boilerplate (React + routing)
+
+ Connect ML pipeline for summarization/Q&A
+
+ Build file upload + parsing (Google DocAI)
+
+ Design clean UI for document + simplified view
+
+ Integrate multi-language & export options
+
+ Final polish + demo prep 🎥
+
+⚠️ Disclaimer
+Lexplain is an assistive tool, not a replacement for legal professionals.
+Always consult a qualified lawyer for binding legal advice.
+
+🏆 Vision
+To make legal knowledge accessible to everyone, by bridging the gap between law and understanding with AI + usability-first design.
+
+pgsql
 Copy code
-cd backend
-npm install
-npm start
-3. Frontend Setup
-bash
-Copy code
-cd frontend
-npm install
-npm start
-👥 Team Roles
-Team Lead: Repo admin, merges, final integration.
 
-Backend Engineer: APIs, Document AI integration.
-
-Frontend Engineer: React UI, Q&A panel, dashboard.
-
-ML Engineer: Chunking, embeddings, RAG logic.
-
-Designer: Wireframes, mockups, UX polish.
+👉 This README introduces the **project purpose, structure, features, setup, team distribution, and hackathon roadmap** all in one.  
