@@ -1,11 +1,3 @@
-You said:
-ok
-ChatGPT said:
-
-Perfect 👍 Let’s make a clear and usable backend/README.md for your repo.
-
-Here’s a draft you can copy:
-
 # Lexplain Backend
 
 This is the backend service for **Lexplain**, responsible for handling document uploads, processing, and communication with ML models and external APIs (Google Cloud, etc.).
@@ -87,3 +79,4 @@ pip freeze > requirements.txt
 
 
 Keep endpoints modular inside routes/ (to be created soon).
+
