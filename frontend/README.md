@@ -23,13 +23,16 @@ http://localhost:5173/
 csharp
 Copy code
 frontend/
-│── public/           # Static assets
-│── src/              # React source code
-│   ├── App.jsx       # Main app
-│   ├── main.jsx      # React entrypoint
-│   └── components/   # UI components (to be added)
-│── package.json      # Project metadata
-└── README.md
+│── src/
+│   ├── components/      # Reusable UI parts (Navbar, Loader, FileUpload, etc.)
+│   ├── pages/           # Each screen
+│   │   ├── Upload.jsx
+│   │   ├── Summary.jsx
+│   │   ├── QA.jsx
+│   │   ├── Dashboard.jsx
+│   ├── App.jsx          # Main routes
+│   ├── main.jsx         # Entry point
+│── public/              # Static files
 🔮 Next Steps
 Set up TailwindCSS for styling
 

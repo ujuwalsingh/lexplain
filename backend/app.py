@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+import PyPDF2
+import docx
 
 app = Flask(__name__)
 CORS(app)
@@ -8,49 +10,80 @@ CORS(app)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
+# ------------------------------
+# Helpers
+# ------------------------------
+def extract_text_from_pdf(filepath):
+    text = ""
+    with open(filepath, "rb") as f:
+        reader = PyPDF2.PdfReader(f)
+        for page in reader.pages:
+            text += page.extract_text() + "\n"
+    return text.strip()
+
+def extract_text_from_docx(filepath):
+    doc = docx.Document(filepath)
+    return "\n".join([p.text for p in doc.paragraphs if p.text.strip()])
+
+def extract_text(filepath):
+    if filepath.endswith(".pdf"):
+        return extract_text_from_pdf(filepath)
+    elif filepath.endswith(".docx"):
+        return extract_text_from_docx(filepath)
+    elif filepath.endswith(".txt"):
+        with open(filepath, "r", encoding="utf-8") as f:
+            return f.read()
+    else:
+        return None
+
+# ------------------------------
+# Routes
+# ------------------------------
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({"message": "Lexplain backend is running 🚀"})
+    return jsonify({"message": "Lexplain backend running 🚀"})
 
-# --- Upload endpoint ---
 @app.route("/upload", methods=["POST"])
 def upload_file():
     if "file" not in request.files:
-        return jsonify({"error": "No file part"}), 400
+        return jsonify({"error": "No file uploaded"}), 400
 
     file = request.files["file"]
-    if file.filename == "":
-        return jsonify({"error": "No selected file"}), 400
+    filepath = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(filepath)
 
-    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(file_path)
+    text = extract_text(filepath)
+    if not text:
+        return jsonify({"error": "Unsupported file type"}), 400
 
-    return jsonify({"message": "File uploaded successfully", "filename": file.filename})
+    return jsonify({"filename": file.filename, "extracted_text": text[:500] + "..."})
 
-# --- Summary endpoint (dummy for now) ---
 @app.route("/summary", methods=["POST"])
-def summary():
+def summarize():
     data = request.get_json()
-    filename = data.get("filename", "unknown document")
+    text = data.get("text", "")
+    if not text:
+        return jsonify({"error": "No text provided"}), 400
 
-    # Later: run Document AI / Gemini here
-    dummy_summary = [
-        {"clause": "Clause 1", "explanation": "This clause defines parties involved."},
-        {"clause": "Clause 2", "explanation": "This clause specifies payment terms."},
-    ]
+    # Placeholder: just return first 3 sentences
+    summary = " ".join(text.split(".")[:3]) + "..."
+    return jsonify({"summary": summary})
 
-    return jsonify({"filename": filename, "summary": dummy_summary})
-
-# --- Q&A endpoint (dummy for now) ---
 @app.route("/qa", methods=["POST"])
 def qa():
     data = request.get_json()
     question = data.get("question", "")
+    text = data.get("text", "")
 
-    # Later: RAG pipeline
-    dummy_answer = f"This is a placeholder answer for: '{question}'"
+    if not question or not text:
+        return jsonify({"error": "Question and text are required"}), 400
 
-    return jsonify({"answer": dummy_answer})
+    # Placeholder: always return same canned response
+    answer = f"For now, I can't fully answer '{question}', but soon this will use ML."
+    return jsonify({"answer": answer})
 
+# ------------------------------
+# Run
+# ------------------------------
 if __name__ == "__main__":
     app.run(debug=True)
