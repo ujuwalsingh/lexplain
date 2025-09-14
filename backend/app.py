@@ -1,35 +1,56 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
+import os
 
 app = Flask(__name__)
+CORS(app)
 
-# Health check
-@app.route("/")
+UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+@app.route("/", methods=["GET"])
 def home():
     return jsonify({"message": "Lexplain backend is running 🚀"})
 
-# Upload endpoint (for legal documents)
+# --- Upload endpoint ---
 @app.route("/upload", methods=["POST"])
-def upload():
-    # for now, just return a dummy response
-    return jsonify({"status": "success", "message": "File received"})
+def upload_file():
+    if "file" not in request.files:
+        return jsonify({"error": "No file part"}), 400
 
-# Summarization endpoint
-@app.route("/summarize", methods=["POST"])
-def summarize():
-    data = request.json
-    text = data.get("text", "")
-    # placeholder
-    summary = "This is where the simplified summary will go."
-    return jsonify({"summary": summary})
+    file = request.files["file"]
+    if file.filename == "":
+        return jsonify({"error": "No selected file"}), 400
 
-# Q&A endpoint
+    file_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(file_path)
+
+    return jsonify({"message": "File uploaded successfully", "filename": file.filename})
+
+# --- Summary endpoint (dummy for now) ---
+@app.route("/summary", methods=["POST"])
+def summary():
+    data = request.get_json()
+    filename = data.get("filename", "unknown document")
+
+    # Later: run Document AI / Gemini here
+    dummy_summary = [
+        {"clause": "Clause 1", "explanation": "This clause defines parties involved."},
+        {"clause": "Clause 2", "explanation": "This clause specifies payment terms."},
+    ]
+
+    return jsonify({"filename": filename, "summary": dummy_summary})
+
+# --- Q&A endpoint (dummy for now) ---
 @app.route("/qa", methods=["POST"])
 def qa():
-    data = request.json
+    data = request.get_json()
     question = data.get("question", "")
-    # placeholder
-    answer = f"Answer for: {question}"
-    return jsonify({"answer": answer})
+
+    # Later: RAG pipeline
+    dummy_answer = f"This is a placeholder answer for: '{question}'"
+
+    return jsonify({"answer": dummy_answer})
 
 if __name__ == "__main__":
     app.run(debug=True)
