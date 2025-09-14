@@ -46,7 +46,7 @@ Copy code
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/<your-username>/lexplain.git
+git clone https://github.com/ujuwalsingh/lexplain.git
 cd lexplain
 2. Setup Backend
 See backend/README.md for setup instructions.
