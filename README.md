@@ -52,7 +52,7 @@ cd lexplain
 See backend/README.md for setup instructions.
 
 3. Setup Frontend
-See frontend/README.md.```
+See frontend/README.md.
 
 👥 Team & Work Distribution
 Backend (Flask APIs, Google Cloud integration) → Lead by You
