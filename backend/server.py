@@ -12,6 +12,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 
+# ========== File Parsing Helpers ==========
 def extract_text_from_pdf(filepath):
     text = ""
     with open(filepath, "rb") as f:
@@ -31,6 +32,7 @@ def extract_text_from_txt(filepath):
         return f.read()
 
 
+# ========== Routes ==========
 @app.route("/")
 def home():
     return jsonify({"message": "Lexplain backend running 🚀"})
@@ -63,5 +65,10 @@ def upload_file():
 
     return jsonify({
         "filename": file.filename,
-        "extracted_text": extracted_text[:500]  # return first 500 chars for preview
+        "extracted_text": extracted_text[:500]  # Preview first 500 chars
     })
+
+
+# ✅ Start Flask server
+if __name__ == "__main__":
+    app.run(debug=True)
