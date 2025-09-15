@@ -1,39 +1,13 @@
-import { useState } from "react";
+// In frontend/src/pages/QA.jsx
+import React from 'react';
 
 function QA() {
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState(null);
-
-  const handleAsk = () => {
-    if (!question.trim()) return;
-    // Later: Call backend Q&A endpoint
-    setAnswer(`Dummy AI answer for: "${question}"`);
-  };
-
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2>❓ Ask Questions About the Document</h2>
-      <input
-        type="text"
-        placeholder="Type your question..."
-        value={question}
-        onChange={(e) => setQuestion(e.target.value)}
-        style={{ width: "60%", padding: "0.5rem", marginRight: "1rem" }}
-      />
-      <button onClick={handleAsk}>Ask</button>
-
-      {answer && (
-        <div
-          style={{
-            marginTop: "1rem",
-            padding: "1rem",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-          }}
-        >
-          <p><strong>Answer:</strong> {answer}</p>
-        </div>
-      )}
+    <div className="page-container">
+      <div className="page-header">
+        <h1>Q&A</h1>
+        <p>Ask questions about your document here.</p>
+      </div>
     </div>
   );
 }
