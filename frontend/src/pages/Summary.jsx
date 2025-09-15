@@ -1,21 +1,12 @@
+// In frontend/src/pages/Summary.jsx
+import React from 'react';
+
 function Summary() {
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2>📝 AI-Generated Summary</h2>
-      <p>
-        This is where the simplified plain-language version of your uploaded
-        legal document will appear.
-      </p>
-      <div
-        style={{
-          border: "1px solid #ccc",
-          padding: "1rem",
-          marginTop: "1rem",
-          borderRadius: "8px",
-        }}
-      >
-        <p><strong>Clause 1:</strong> Example simplified explanation…</p>
-        <p><strong>Clause 2:</strong> Example simplified explanation…</p>
+    <div className="page-container">
+      <div className="page-header">
+        <h1>Document Summary</h1>
+        <p>A concise summary of your document will appear here.</p>
       </div>
     </div>
   );
