@@ -1,4 +1,3 @@
-// In frontend/src/pages/Upload.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,8 +7,47 @@ function Upload() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleFileChange = (e) => setFile(e.target.files[0]);
-  const handleUpload = async () => navigate('/dashboard?docId=new-doc-123');
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+    setError(null); // Clear previous errors
+  };
+
+  const handleUpload = async () => {
+    if (!file) return;
+
+    setLoading(true);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      // Step 1: Upload the file
+      const uploadResponse = await fetch('http://127.0.0.1:5001/upload', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('File upload failed.');
+      }
+
+      const uploadResult = await uploadResponse.json();
+      
+      // Step 2: Navigate to dashboard with GCS URI
+      // We'll pass the GCS info to the dashboard via search params
+      const searchParams = new URLSearchParams({
+        gcs_uri: uploadResult.gcs_uri,
+        mime_type: uploadResult.mime_type
+      });
+      navigate(`/dashboard?${searchParams.toString()}`);
+
+    } catch (err) {
+      setError(err.message || 'An unexpected error occurred.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="upload-container">
@@ -23,7 +61,7 @@ function Upload() {
           </label>
         </div>
         <button onClick={handleUpload} disabled={loading || !file} className="upload-button">
-          {loading ? 'Analyzing...' : 'Analyze Document'}
+          {loading ? 'Processing...' : 'Analyze Document'}
         </button>
         {error && <p className="upload-error">{error}</p>}
       </div>
