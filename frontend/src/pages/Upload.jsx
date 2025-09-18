@@ -22,20 +22,19 @@ function Upload() {
     formData.append('file', file);
 
     try {
-      // Step 1: Upload the file
       const uploadResponse = await fetch('http://127.0.0.1:5001/upload', {
         method: 'POST',
         body: formData,
       });
 
       if (!uploadResponse.ok) {
-        throw new Error('File upload failed.');
+        // Try to get a specific error message from the backend
+        const errorData = await uploadResponse.json();
+        throw new Error(errorData.error || 'File upload failed.');
       }
 
       const uploadResult = await uploadResponse.json();
       
-      // Step 2: Navigate to dashboard with GCS URI
-      // We'll pass the GCS info to the dashboard via search params
       const searchParams = new URLSearchParams({
         gcs_uri: uploadResult.gcs_uri,
         mime_type: uploadResult.mime_type
@@ -43,6 +42,7 @@ function Upload() {
       navigate(`/dashboard?${searchParams.toString()}`);
 
     } catch (err) {
+      // Now, this will display either our custom error or a default one
       setError(err.message || 'An unexpected error occurred.');
     } finally {
       setLoading(false);

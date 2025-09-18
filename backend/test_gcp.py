@@ -1,11 +1,7 @@
-import os
-from google.cloud import storage
+import google.generativeai as genai
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "key.json"
+genai.configure(api_key="YOUR_API_KEY")  # or use GOOGLE_API_KEY env var
 
-client = storage.Client()
-buckets = list(client.list_buckets())
-
-print("Buckets in project:")
-for b in buckets:
-    print(b.name)
+model = genai.GenerativeModel("gemini-1.5-flash")
+resp = model.generate_content("Say 'Hello from Gemini!' in 3 words.")
+print(resp.text)

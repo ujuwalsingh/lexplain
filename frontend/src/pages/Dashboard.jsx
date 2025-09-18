@@ -1,67 +1,69 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useContext, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { AnalysisContext } from '../context/AnalysisContext';
 import QABox from '../components/QABox';
+import ClauseAnalysis from '../components/ClauseAnalysis';
+import SummaryAnalysis from '../components/SummaryAnalysis';
 
 function Dashboard() {
   const [searchParams] = useSearchParams();
-  const [docData, setDocData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [openClauseId, setOpenClauseId] = useState(null);
+  const { setDocData, setLoading, setError, docData, loading, error } = useContext(AnalysisContext);
+  const [activeTab, setActiveTab] = useState('summary'); // Controls which view is visible
 
   const gcsUri = searchParams.get('gcs_uri');
   const mimeType = searchParams.get('mime_type');
 
   useEffect(() => {
-    if (!gcsUri || !mimeType) {
-      setLoading(false);
-      return;
-    }
+    // Only fetch data if we have a new document and no data is loaded yet
+    if (gcsUri && !docData) {
+      const analyzeDocument = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+          const response = await fetch('http://127.0.0.1:5001/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ gcs_uri: gcsUri, mime_type: mimeType }),
+          });
 
-    const analyzeDocument = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await fetch('http://127.0.0.1:5001/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gcs_uri: gcsUri, mime_type: mimeType }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to analyze document.');
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to analyze document.');
+          }
+          
+          const data = await response.json();
+          setDocData(data);
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLoading(false);
         }
-        
-        const data = await response.json();
-        setDocData(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
+      };
+      analyzeDocument();
+    } else if (!gcsUri) {
         setLoading(false);
-      }
-    };
-
-    analyzeDocument();
-  }, [gcsUri, mimeType]);
-
-  const handleClauseToggle = (clauseId) => {
-    setOpenClauseId(prevId => (prevId === clauseId ? null : clauseId));
-  };
+    }
+  }, [gcsUri, mimeType, setDocData, setLoading, setError, docData]);
 
   if (loading) {
-    return <div className="page-container"><p>Analyzing document with AI...</p></div>;
+    return (
+      <div className="page-container loader-container">
+        <div className="loader"></div>
+        <p>Analyzing document with AI... This may take a moment.</p>
+      </div>
+    );
   }
 
   if (error) {
     return <div className="page-container"><p className="upload-error">Error: {error}</p></div>;
   }
   
-  if (!gcsUri) {
+  if (!gcsUri || !docData) {
     return (
       <div className="page-container">
         <div className="page-header">
             <h1>Dashboard</h1>
-            <p>Please upload a document first to see the analysis.</p>
+            <p>Please upload a document to begin.</p>
         </div>
       </div>
     );
@@ -69,41 +71,32 @@ function Dashboard() {
 
   return (
     <div className="page-container">
-      <div className="page-header">
-        <h1>Document Analysis</h1>
-        <p>Showing results for: {gcsUri.split('/').pop()}</p>
-      </div>
-
-      <div className="dashboard-layout">
-        <div className="dashboard-panel">
-          <h2>Original Document</h2>
-          <pre className="original-text-panel">{docData?.originalText}</pre>
+        <div className="page-header">
+            <div>
+                <h1>Document Analysis</h1>
+                <p>Showing results for: <strong>{gcsUri.split('/').pop()}</strong></p>
+            </div>
         </div>
+        <div className="dashboard-layout">
+            <div className="dashboard-panel">
+                <h2>Original Document</h2>
+                <pre className="original-text-panel">{docData.originalText}</pre>
+            </div>
 
-        <div className="dashboard-panel">
-          <div className="analysis-card">
-            <h3>Summary</h3>
-            <ul>{docData?.summary.map((item, index) => <li key={index}>{item}</li>)}</ul>
-          </div>
-          
-          <div className="analysis-card">
-            <h3>Clause-by-Clause</h3>
-            {docData?.clauses.map(clause => (
-              <div key={clause.id} className="clause-item">
-                <p className="clause-title" onClick={() => handleClauseToggle(clause.id)}>
-                  {openClauseId === clause.id ? '▼' : '►'} {clause.title}
-                </p>
-                {openClauseId === clause.id && <p className="clause-explanation">{clause.explanation}</p>}
-              </div>
-            ))}
-          </div>
-          
-          <div className="analysis-card">
-            <h3>Ask a Question</h3>
-            <QABox docId={gcsUri} />
-          </div>
+            <div className="dashboard-panel">
+                <div className="tabs">
+                    <button onClick={() => setActiveTab('summary')} className={activeTab === 'summary' ? 'active' : ''}>Summary</button>
+                    <button onClick={() => setActiveTab('clauses')} className={activeTab === 'clauses' ? 'active' : ''}>Clause Analysis</button>
+                    <button onClick={() => setActiveTab('qa')} className={activeTab === 'qa' ? 'active' : ''}>Q&A</button>
+                </div>
+
+                <div className="tab-content">
+                    {activeTab === 'summary' && <SummaryAnalysis />}
+                    {activeTab === 'clauses' && <ClauseAnalysis />}
+                    {activeTab === 'qa' && <QABox docText={docData.originalText} />}
+                </div>
+            </div>
         </div>
-      </div>
     </div>
   );
 }

@@ -1,54 +1,71 @@
-// In frontend/src/components/QABox.jsx
 import { useState } from 'react';
 
-function QABox({ docId }) {
+function QABox({ docText }) { 
   const [question, setQuestion] = useState('');
-  const [answer, setAnswer] = useState(null);
+  const [answer, setAnswer] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleAsk = async () => {
-    if (!question.trim()) return;
+  const handleAskQuestion = async () => {
+    if (!question.trim()) {
+      setError("Please enter a question.");
+      return;
+    }
     
     setLoading(true);
-    setAnswer(null);
     setError(null);
+    setAnswer('');
+
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      const mockAnswer = {
-        answer: `This is the AI's answer to your question: "${question}".`,
-        citations: [{ text: "This is the original text from the document used for the answer." }]
-      };
-      setAnswer(mockAnswer);
+      const response = await fetch('http://127.0.0.1:5001/qa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          question: question,
+          textContent: docText
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to get an answer.');
+      }
+      
+      const data = await response.json();
+      setAnswer(data.answer);
+
     } catch (err) {
-      setError('Failed to get an answer.');
+      setError(err.message || 'An unexpected error occurred.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div>
-      <input
-        type="text"
-        value={question}
-        onChange={(e) => setQuestion(e.target.value)}
-        placeholder="Type your question..."
-        className="qabox-input"
-        disabled={loading}
-      />
-      <button onClick={handleAsk} disabled={loading} className="qabox-button">
-        {loading ? '...' : 'Ask'}
-      </button>
-
-      {error && <p className="upload-error">{error}</p>}
+    <div className="qa-container">
+      <div className="qa-input-container">
+        <textarea
+          className="qa-input"
+          placeholder="e.g., What is the termination clause?"
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          disabled={loading}
+        />
+        <button 
+          className="qa-button"
+          onClick={handleAskQuestion} 
+          disabled={loading || !question.trim()}
+        >
+          {loading ? '...' : 'Ask'}
+        </button>
+      </div>
+      
+      {error && <p className="upload-error" style={{marginTop: '10px'}}>{error}</p>}
 
       {answer && (
-        <div className="qabox-answer">
-          <p>{answer.answer}</p>
-          <div className="qabox-source">
-            <p><strong>Source:</strong> "{answer.citations[0].text}"</p>
-          </div>
+        <div className="qa-answer">
+          <h4>Answer:</h4>
+          <p>{answer}</p>
         </div>
       )}
     </div>
