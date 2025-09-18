@@ -4,8 +4,8 @@ import os
 
 # --- CONFIGURATION ---
 # It's better to get these from a central config, but for now, this works.
-GCP_PROJECT_ID = "fafaf"
-GCS_BUCKET_NAME = "sbsbgwsg"
+GCP_PROJECT_ID = "svsgs"
+GCS_BUCKET_NAME = "sggwg"
 
 # Initialize Google Cloud Storage client
 storage_client = storage.Client(project=GCP_PROJECT_ID)

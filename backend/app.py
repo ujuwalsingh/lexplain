@@ -19,9 +19,9 @@ CORS(app)
 
 # --- CONFIGURATION ---
 # We no longer need to initialize Vertex AI here
-GCP_PROJECT_ID = "afsf" # Your new project ID
-GCS_BUCKET_NAME = "awdfcdfc"
-DOCAI_PROCESSOR_ID = "adfcaf"
+GCP_PROJECT_ID = "fwfwfwfw" # Your new project ID
+GCS_BUCKET_NAME = "fwfqwf"
+DOCAI_PROCESSOR_ID = "fwsef"
 DOCAI_LOCATION = "us" 
 
 # --- INITIALIZE SERVICES ---
