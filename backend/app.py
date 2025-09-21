@@ -1,41 +1,40 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from google.cloud import documentai
-from routes.export import export_bp
-from routes.translate import translate_bp
 
-# Import blueprints from your routes
-from routes.upload import upload_bp
-from routes.qa import qa_bp
+# --- IMPORT BLUEPRINTS ---
+from routes.export import export_bp, generate_checklist
+from routes.translate import translate_bp, translate_texts
+from routes.upload import upload_bp, upload_to_gcs
+from routes.qa import qa_bp, answer_question
+from routes.summarize import summarize_bp, summarize_text
 
-# Import ML services
+# --- IMPORT ML services ---
 from ml.embedding_service import (
     generate_summary_with_gemini, 
     generate_clause_explanations_with_gemini,
     generate_risk_scores_with_gemini
 )
 
+# --- APP SETUP ---
 app = Flask(__name__)
 CORS(app)
 
 # --- CONFIGURATION ---
-# We no longer need to initialize Vertex AI here
-GCP_PROJECT_ID = "lexplain-472504" # Your new project ID
+GCP_PROJECT_ID = "lexplain-472504"
 GCS_BUCKET_NAME = "lexplain-storage"
 DOCAI_PROCESSOR_ID = "19531a9534629747"
-DOCAI_LOCATION = "us" 
-
+DOCAI_LOCATION = "us"
 
 # --- INITIALIZE SERVICES ---
 docai_client = documentai.DocumentProcessorServiceClient()
-
 
 # --- REGISTER ROUTES (Blueprints) ---
 app.register_blueprint(upload_bp)
 app.register_blueprint(qa_bp)
 app.register_blueprint(export_bp)
 app.register_blueprint(translate_bp)
-
+app.register_blueprint(summarize_bp)
 
 # --- CORE ANALYSIS ROUTE ---
 @app.route("/analyze", methods=["POST"])
@@ -60,23 +59,25 @@ def analyze_document():
         # Step 2: Generate summary and clauses
         summary_points = generate_summary_with_gemini(extracted_text)
         clauses = generate_clause_explanations_with_gemini(extracted_text)
-        
-        # Step 3: Generate risk scores for the clauses
+
+        # Step 3: Generate risk scores
         clauses_with_risk = generate_risk_scores_with_gemini(clauses)
-        
+
         dashboard_data = {
-          "summary": summary_points,
-          "originalText": extracted_text,
-          "clauses": clauses_with_risk
+            "summary": summary_points,
+            "originalText": extracted_text,
+            "clauses": clauses_with_risk
         }
-        
+
         return jsonify(dashboard_data)
 
     except Exception as e:
         print(f"An error occurred during /analyze: {e}") 
         return jsonify({"error": f"An error occurred during analysis: {str(e)}"}), 500
 
+@app.route("/")
+def home():
+    return "Backend running!"
 
-# --- RUN APPLICATION ---
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(host="0.0.0.0", port=5000)

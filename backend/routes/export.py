@@ -3,6 +3,10 @@ from ml.embedding_service import generate_checklist_with_gemini
 
 export_bp = Blueprint('export_bp', __name__)
 
+def generate_checklist(text_content):
+    """Core checklist generation logic."""
+    return generate_checklist_with_gemini(text_content)
+
 @export_bp.route('/export-checklist', methods=['POST'])
 def export_checklist():
     data = request.get_json()
@@ -12,9 +16,7 @@ def export_checklist():
         return jsonify({"error": "Document text is required"}), 400
 
     try:
-        checklist_text = generate_checklist_with_gemini(text_content)
-        
-        # We configure the response to be a downloadable text file
+        checklist_text = generate_checklist(text_content)
         return Response(
             checklist_text,
             mimetype="text/plain",
