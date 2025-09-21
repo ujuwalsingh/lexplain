@@ -15,7 +15,7 @@
  * IMPORTANT: If you used a different framework (like Vite), change the variable name accordingly
  * (e.g., process.env.VITE_API_URL).
  */
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_BASE_URL = process.env.VITE_API_URL || "http://localhost:5000";
 
 // --- HELPER FUNCTION FOR API CALLS ---
 
