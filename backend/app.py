@@ -24,7 +24,7 @@ app = Flask(__name__)
 # --- CORS CONFIGURATION ---
 # This is a critical security change.
 # It restricts access to your Vercel frontend and common local development servers.
-frontend_url = "https://lexplain-86vy.vercel.app"
+frontend_url = "https://lexplain-three.vercel.app"
 CORS(app, origins=[frontend_url, "http://localhost:3000", "http://localhost:5173"], supports_credentials=True)
 
 # --- GCP CONFIGURATION ---
