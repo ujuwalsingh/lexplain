@@ -8,12 +8,12 @@
 
 /**
  * The base URL for the backend API.
- * 1. It first tries to read the environment variable `NEXT_PUBLIC_API_URL` which you set on Vercel.
+ * 1. It first tries to read the environment variable `VITE_API_URL` which you set on Vercel.
  * 2. If it's not found (meaning we are likely in a local development environment),
  * it defaults to 'http://localhost:5000'.
  *
- * IMPORTANT: If you used a different framework (like Vite), change the variable name accordingly
- * (e.g., process.env.VITE_API_URL).
+ * IMPORTANT: If you used a different framework (like Next.js), change the variable name accordingly
+ * (e.g., process.env.NEXT_PUBLIC_API_URL).
  */
 const API_BASE_URL = process.env.VITE_API_URL || "http://localhost:5000";
 
@@ -117,7 +117,8 @@ export const translateTexts = async (texts, target) => {
  */
 export const exportChecklist = async (textContent) => {
   try {
-    const response = await apiFetch('/api/export/checklist', {
+    // *** THIS IS THE CORRECTED LINE ***
+    const response = await apiFetch('/api/export/export-checklist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ textContent }),
@@ -139,3 +140,4 @@ export const exportChecklist = async (textContent) => {
     throw error;
   }
 };
+
