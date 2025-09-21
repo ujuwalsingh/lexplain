@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 from google.cloud import documentai
 from routes.export import export_bp
+from routes.translate import translate_bp
 
 # Import blueprints from your routes
 from routes.upload import upload_bp
@@ -19,13 +20,13 @@ CORS(app)
 
 # --- CONFIGURATION ---
 # We no longer need to initialize Vertex AI here
-GCP_PROJECT_ID = "fwfwfwfw" # Your new project ID
-GCS_BUCKET_NAME = "fwfqwf"
-DOCAI_PROCESSOR_ID = "fwsef"
+GCP_PROJECT_ID = "lexplain-472504" # Your new project ID
+GCS_BUCKET_NAME = "lexplain-storage"
+DOCAI_PROCESSOR_ID = "19531a9534629747"
 DOCAI_LOCATION = "us" 
 
+
 # --- INITIALIZE SERVICES ---
-# REMOVED the vertexai.init(...) line
 docai_client = documentai.DocumentProcessorServiceClient()
 
 
@@ -33,6 +34,7 @@ docai_client = documentai.DocumentProcessorServiceClient()
 app.register_blueprint(upload_bp)
 app.register_blueprint(qa_bp)
 app.register_blueprint(export_bp)
+app.register_blueprint(translate_bp)
 
 
 # --- CORE ANALYSIS ROUTE ---

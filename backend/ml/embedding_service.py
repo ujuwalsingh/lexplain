@@ -1,6 +1,7 @@
 import os
 import google.generativeai as genai
 import json
+import re
 import time
 
 # --- CONFIGURATION ---
@@ -12,10 +13,18 @@ MODEL_NAME = "gemini-1.5-flash-latest"
 
 # --- HELPER FUNCTIONS ---
 
+import os
+import google.generativeai as genai
+import json
+import re # Make sure to import this at the top of your file
+
+# ... (rest of the file)
+
 def generate_summary_with_gemini(text_content):
-    model = genai.GenerativeModel(MODEL_NAME)
+    """Generates a summary using the Gemini model with robust cleaning."""
+    model = genai.GenerativeModel("gemini-1.5-flash-latest")
     prompt = f"""
-    You are an expert legal assistant. Provide a clear, concise summary of the following legal document as 3 to 5 key bullet points.
+    You are an expert legal assistant. Provide a clear, concise summary of the following legal document as 3 to 5 key bullet points. Do not use markdown formatting like asterisks for bolding.
     **Document Text:**
     ---
     {text_content}
@@ -24,11 +33,16 @@ def generate_summary_with_gemini(text_content):
     """
     response = model.generate_content(prompt)
     summary_text = response.text.strip()
-    summary_points = [
-        point.strip().lstrip("*- ") for point in summary_text.split('\n') if point.strip()
-    ]
-    if len(summary_points) == 1 and len(summary_text) > 150:
-        return [sentence.strip() for sentence in summary_text.split('.') if sentence.strip()]
+    
+    summary_points = []
+    for point in summary_text.split('\n'):
+        # This removes any leading list markers (like * or -) and then any surrounding asterisks or whitespace
+        if point.strip():
+            cleaned_point = re.sub(r'^\s*[\*\-\•]+\s*', '', point)
+            cleaned_point = cleaned_point.strip().strip('*').strip()
+            if cleaned_point:
+                summary_points.append(cleaned_point)
+            
     return summary_points
 
 def generate_clause_explanations_with_gemini(text_content):
@@ -108,7 +122,7 @@ def generate_risk_scores_with_gemini(clauses):
         return clauses
 
 def generate_checklist_with_gemini(text_content):
-    """Generates a checklist of obligations and deadlines from the text."""
+    """Generates a checklist from the text using the Gemini API, now with multilingual support."""
     model = genai.GenerativeModel("gemini-1.5-flash-latest") 
     
     prompt = f"""
