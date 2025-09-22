@@ -21,9 +21,12 @@ def upload_to_gcs(file_obj, filename, content_type):
     blob.upload_from_file(file_obj, content_type=content_type)
     return f"gs://{GCS_BUCKET_NAME}/{filename}", content_type
 
-@upload_bp.route("/", methods=["POST"])
+@upload_bp.route("/", methods=["POST", "OPTIONS"])
 def upload_file():
     """Handles file uploads, creating a secure, unique filename."""
+    if request.method == "OPTIONS": # Handle preflight request
+        return jsonify(success=True)
+    
     if "file" not in request.files:
         return jsonify({"error": "No file part in the request"}), 400
 
