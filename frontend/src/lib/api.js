@@ -8,12 +8,10 @@
 
 /**
  * The base URL for the backend API.
- * 1. It first tries to read the environment variable `VITE_API_URL` which you set on Vercel.
- * 2. If it's not found (meaning we are likely in a local development environment),
- * it defaults to 'http://localhost:5000'.
+ * It reads the VITE_API_URL from Vite's environment variables.
+ * If not found, it defaults to the local development server.
  *
- * IMPORTANT: If you used a different framework (like Next.js), change the variable name accordingly
- * (e.g., process.env.NEXT_PUBLIC_API_URL).
+ * *** THIS IS THE CORRECTED LINE FOR VITE ***
  */
 const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
@@ -55,9 +53,7 @@ export const uploadDocument = async (file) => {
   const formData = new FormData();
   formData.append("file", file);
 
-  // Note: We use fetch directly here because apiFetch is tailored for JSON.
-  // The browser automatically sets the correct 'Content-Type' for FormData.
-  const response = await fetch(`${API_BASE_URL}/api/upload`, {
+  const response = await fetch(`${API_BASE_URL}/api/upload/`, { // Added trailing slash for consistency
     method: 'POST',
     body: formData,
   });
@@ -90,7 +86,7 @@ export const analyzeDocument = async (gcs_uri, mime_type) => {
  * @returns {Promise<{answer: string}>}
  */
 export const askQuestion = async (question, textContent) => {
-  return apiFetch('/api/qa', {
+  return apiFetch('/api/qa/', { // Added trailing slash for consistency
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ question, textContent }),
@@ -104,7 +100,7 @@ export const askQuestion = async (question, textContent) => {
  * @returns {Promise<{translated_texts: string[]}>}
  */
 export const translateTexts = async (texts, target) => {
-  return apiFetch('/api/translate', {
+  return apiFetch('/api/translate/', { // Added trailing slash for consistency
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ texts, target }),
@@ -117,26 +113,23 @@ export const translateTexts = async (texts, target) => {
  */
 export const exportChecklist = async (textContent) => {
   try {
-    // *** THIS IS THE CORRECTED LINE ***
     const response = await apiFetch('/api/export/checklist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ textContent }),
     });
 
-    // The response body is the text file content itself.
     const blob = await response.blob();
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = "Lexplain-Checklist.txt"; // The filename for the download
+    a.download = "Lexplain-Checklist.txt";
     document.body.appendChild(a);
     a.click();
-    a.remove(); // Clean up the DOM
+    a.remove();
     window.URL.revokeObjectURL(url);
   } catch (error) {
     console.error("Failed to export checklist:", error);
-    // You might want to show an error message to the user here.
     throw error;
   }
 };
