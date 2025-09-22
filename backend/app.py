@@ -25,7 +25,7 @@ app = Flask(__name__)
 # --- CORS CONFIGURATION ---
 # This is a critical security change.
 # It restricts access to your Vercel frontend and common local development servers.
-origins_regex = re.compile(r"https?://(localhost:\d+|lexplain-three\.vercel\.app|.*--lexplain-three\.vercel\.app)")
+origins_regex = re.compile(r"https?://(localhost:\d+|lexplain-.*\.vercel\.app)")
 CORS(app, origins=origins_regex, supports_credentials=True)
 
 # --- GCP CONFIGURATION ---
