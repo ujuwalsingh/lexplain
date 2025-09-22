@@ -1,4 +1,5 @@
 import os
+import re
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from google.cloud import documentai
@@ -24,8 +25,8 @@ app = Flask(__name__)
 # --- CORS CONFIGURATION ---
 # This is a critical security change.
 # It restricts access to your Vercel frontend and common local development servers.
-frontend_url = "https://lexplain-three.vercel.app"
-CORS(app, origins=[frontend_url, "http://localhost:3000", "http://localhost:5173"], supports_credentials=True)
+origins_regex = re.compile(r"https?://(localhost:\d+|lexplain-three\.vercel\.app|.*--lexplain-three\.vercel\.app)")
+CORS(app, origins=origins_regex, supports_credentials=True)
 
 # --- GCP CONFIGURATION ---
 # This is a critical production change.
