@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { uploadDocument } from '../lib/api'; // Import the API function
 
 function Upload() {
   const [file, setFile] = useState(null);
@@ -18,22 +19,8 @@ function Upload() {
     setLoading(true);
     setError(null);
 
-    const formData = new FormData();
-    formData.append('file', file);
-
     try {
-      const uploadResponse = await fetch('http://127.0.0.1:5001/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!uploadResponse.ok) {
-        // Try to get a specific error message from the backend
-        const errorData = await uploadResponse.json();
-        throw new Error(errorData.error || 'File upload failed.');
-      }
-
-      const uploadResult = await uploadResponse.json();
+      const uploadResult = await uploadDocument(file); // Use the imported function
       
       const searchParams = new URLSearchParams({
         gcs_uri: uploadResult.gcs_uri,

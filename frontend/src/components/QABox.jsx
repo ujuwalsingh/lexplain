@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { askQuestion } from '../lib/api'; // Import the API function
 
 function QABox({ docText }) { 
   const [question, setQuestion] = useState('');
@@ -17,21 +18,7 @@ function QABox({ docText }) {
     setAnswer('');
 
     try {
-      const response = await fetch('http://127.0.0.1:5001/qa', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: question,
-          textContent: docText
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to get an answer.');
-      }
-      
-      const data = await response.json();
+      const data = await askQuestion(question, docText); // Use the imported function
       setAnswer(data.answer);
 
     } catch (err) {

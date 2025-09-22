@@ -15,7 +15,7 @@
  * IMPORTANT: If you used a different framework (like Next.js), change the variable name accordingly
  * (e.g., process.env.NEXT_PUBLIC_API_URL).
  */
-const API_BASE_URL = process.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 // --- HELPER FUNCTION FOR API CALLS ---
 
@@ -118,7 +118,7 @@ export const translateTexts = async (texts, target) => {
 export const exportChecklist = async (textContent) => {
   try {
     // *** THIS IS THE CORRECTED LINE ***
-    const response = await apiFetch('/api/export/export-checklist', {
+    const response = await apiFetch('/api/export/checklist', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ textContent }),
@@ -140,4 +140,3 @@ export const exportChecklist = async (textContent) => {
     throw error;
   }
 };
-

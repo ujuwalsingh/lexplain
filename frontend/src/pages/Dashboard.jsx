@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import QABox from '../components/QABox';
+import { analyzeDocument, translateTexts, exportChecklist as apiExportChecklist } from '../lib/api'; // Import API functions
 
 const getRiskColor = (riskLevel) => {
   switch (riskLevel?.toLowerCase()) {
@@ -29,24 +30,13 @@ function Dashboard() {
       return;
     }
 
-    const analyzeDocument = async () => {
+    const doAnalyzeDocument = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch('http://127.0.0.1:5001/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gcs_uri: gcsUri, mime_type: mimeType }),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to analyze document.');
-        }
-        
-        const data = await response.json();
-        setOriginalDocData(data); // Store the original English data
-        setDisplayDocData(data);  // Set the initial display data
+        const data = await analyzeDocument(gcsUri, mimeType); // Use the imported function
+        setOriginalDocData(data);
+        setDisplayDocData(data);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -54,13 +44,13 @@ function Dashboard() {
       }
     };
 
-    analyzeDocument();
+    doAnalyzeDocument();
   }, [gcsUri, mimeType]);
 
   const handleLanguageChange = async (e) => {
     const targetLang = e.target.value;
     if (targetLang === 'en') {
-      setDisplayDocData(originalDocData); // If English, just revert to original
+      setDisplayDocData(originalDocData);
       return;
     }
     if (!originalDocData) return;
@@ -76,17 +66,7 @@ function Dashboard() {
         ...originalDocData.clauses.map(c => c.riskJustification)
       ];
 
-      const response = await fetch('http://127.0.0.1:5001/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ texts: textsToTranslate, target: targetLang }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Translation service failed.');
-      }
-      const { translated_texts } = await response.json();
+      const { translated_texts } = await translateTexts(textsToTranslate, targetLang); // Use the imported function
 
       let currentIndex = 0;
       const translatedSummary = translated_texts.slice(currentIndex, currentIndex + originalDocData.summary.length);
@@ -112,7 +92,7 @@ function Dashboard() {
       setIsTranslating(false);
     }
   };
-
+  
   const handleClauseToggle = (clauseId) => {
     setOpenClauseId(prevId => (prevId === clauseId ? null : clauseId));
   };
@@ -120,21 +100,7 @@ function Dashboard() {
   const handleExportChecklist = async () => {
     if (!originalDocData?.originalText) return;
     try {
-      const response = await fetch('http://127.0.0.1:5001/export-checklist', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ textContent: originalDocData.originalText }),
-      });
-      if (!response.ok) throw new Error('Failed to export checklist.');
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${gcsUri.split('/').pop().replace(/\.[^/.]+$/, "")}-checklist.txt`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      a.remove();
+      await apiExportChecklist(originalDocData.originalText); 
     } catch (err) {
       setError(`Export failed: ${err.message}`);
     }
