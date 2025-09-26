@@ -13,7 +13,7 @@ except KeyError:
     # You might want to exit or handle this more gracefully depending on your setup
     # For now, subsequent calls will fail, which is informative enough.
 
-MODEL_NAME = "gemini-1.5-flash-latest"
+MODEL_NAME = "gemini-2.0-flash-001"
 
 # --- CORE FUNCTIONS ---
 
